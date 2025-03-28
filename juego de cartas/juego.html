@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+    <center>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Push Your Luck Solitary</title>
+ 
+</head>
+<body>
+    <h1>Push Your Luck Solitary</h1>
+
+    <div class="game-info">
+        <p>Número de vidas: <span id="lives">3</span></p>
+        <p>Contador de cartas levantadas: <span id="score">1</span></p>
+        <p>Primera carta levantada: <span id="current-card">-</span></p>
+    </div>
+
+    <div class="cards" id="card-display">?</div>
+
+    <div class="buttons">
+        <button id="alta" class="background-color black">ALTA (15)</button>
+        <button id="baja">BAJA (15)</button>
+        <button id="mismo-color">MISMO COLOR (5)</button>
+        <button id="distinto-color">DISTINTO COLOR (5)</button>
+        <button id="suma">SUMA  11 (10)</button>
+        <button id="comodin">COMODÍN (3)</button>
+        <button id="plantarse">PLANTARSE</button>
+    </div>
+
+    <script>
+        const suits = ['picas', 'trébol', 'corazón', 'diamantes'];
+        const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+        const cardValueMap = { A: 1, J: 10, Q: 10, K: 10 };
+
+        let vidas = 3;
+        let record = 1;
+        let combo = 0;
+
+        const buttonCounters = {
+            alta: 15,
+            baja: 15,
+            'mismo-color': 5,
+            'distinto-color': 5,
+            'suma': 10,
+            comodin: 3
+        };
+
+        let currentCard = drawCard();
+        let cardDisplay = document.getElementById('card-display');
+        let livesDisplay = document.getElementById('lives');
+        let scoreDisplay = document.getElementById('score');
+        let currentCardDisplay = document.getElementById('current-card');
+
+        function drawCard() {
+            const value = values[Math.floor(Math.random() * values.length)];
+            const suit = suits[Math.floor(Math.random() * suits.length)];
+            return { value, suit };
+        }
+
+        function getCardNumericValue(card) {
+            return cardValueMap[card.value] || parseInt(card.value, 10);
+        }
+
+        function isSameColor(card1, card2) {
+            const redSuits = ['corazón', 'diamantes'];
+            const blackSuits = ['picas', 'trébol'];
+            return (
+                (redSuits.includes(card1.suit) && redSuits.includes(card2.suit)) ||
+                (blackSuits.includes(card1.suit) && blackSuits.includes(card2.suit))
+            );
+        }
+
+        function updateDisplay() {
+            cardDisplay.textContent = `${currentCard.value} ${currentCard.suit}`;
+            currentCardDisplay.textContent = `${currentCard.value} ${currentCard.suit}`;
+            livesDisplay.textContent = vidas;
+            scoreDisplay.textContent = record;
+            for (const [key, count] of Object.entries(buttonCounters)) {
+                document.getElementById(key).textContent = `${key.toUpperCase()} (${count})`;
+                document.getElementById(key).disabled = count <= 0;
+            }
+        }
+
+        function handleButton(action) {
+            const nextCard = drawCard();
+            const currentValue = getCardNumericValue(currentCard);
+            const nextValue = getCardNumericValue(nextCard);
+
+            let success = false;
+            if (action === 'alta') success = nextValue > currentValue;
+            else if (action === 'baja') success = nextValue < currentValue;
+            else if (action === 'mismo-color') success = isSameColor(currentCard, nextCard);
+            else if (action === 'distinto-color') success = !isSameColor(currentCard, nextCard);
+            else if (action === 'suma') success = currentValue + nextValue < 11;
+            else if (action === 'comodin') success = true;
+
+            buttonCounters[action]--;
+
+            if (success) {
+                combo++;
+                if (combo >= 5 && action !== 'comodin') {
+                    combo = 0;
+                    for (const key of Object.keys(buttonCounters)) {
+                        if (key !== 'comodin') buttonCounters[key]++;
+                    }
+                }
+                record++;
+                currentCard = nextCard;
+            } else {
+                vidas--;
+                combo = 0;
+                if (vidas === 0) {
+                    alert('Game over! Puntuación: 0');
+                    location.reload();
+                }
+            }
+            updateDisplay();
+        }
+
+        document.getElementById('alta').onclick = () => handleButton('alta');
+        document.getElementById('baja').onclick = () => handleButton('baja');
+        document.getElementById('mismo-color').onclick = () => handleButton('mismo-color');
+        document.getElementById('distinto-color').onclick = () => handleButton('distinto-color');
+        document.getElementById('suma').onclick = () => handleButton('suma');
+        document.getElementById('comodin').onclick = () => handleButton('comodin');
+        document.getElementById('plantarse').onclick = () => {
+            alert(`Fin de la partida. Puntuación: ${score}`);
+            location.reload();
+        };
+
+        updateDisplay();
+    </script>
+</body>
+</center>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SweetAlert - para - Tuto Z</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+    .btn {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .btn:hover {
+      background-color: #45a049;
+    }
+    .swal2-html-container {
+      text-align: left;
+    }
+    .combination-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .combination-item img {
+      width: 40px;
+      height: 40px;
+      margin-right: 10px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Premios Tuto Z</h1>
+  <button class="btn" id="showCombinations">Mostrar combinaciones</button>
+
+  <script>
+    document.getElementById('showCombinations').addEventListener('click', function () {
+      Swal.fire({
+        title: '<strong>Escala de Combinaciones</strong>',
+        html: `
+          <div class="combination-item">
+            <img src="ruta/de/la/imagen-pareja.jpg" alt="Pareja">
+            <p><strong>Pareja(nombre)</strong> - Puntos: 2</p>
+          </div>
+          <div class="combination-item">
+            <img src="ruta/de/la/imagen-trio.jpg" alt="Trío">
+            <p><strong>Trío(nombre)</strong> - Puntos: 5</p>
+          </div>
+          <div class="combination-item">
+            <img src="ruta/de/la/imagen-doble-pareja.jpg" alt="Doble Pareja">
+            <p><strong>Doble Pareja(nombre)</strong> - Puntos: 6</p>
+          </div>
+          <div class="combination-item">
+            <img src="ruta/de/la/imagen-cuarteto.jpg" alt="Cuarteto">
+            <p><strong>Cuarteto(nombre)</strong> - Puntos: 10</p>
+          </div>
+          <div class="combination-item">
+            <img src="ruta/de/la/imagen-escalera3.jpg" alt="Escalera 3">
+            <p><strong>Escalera Referencia(3)(referencia)</strong> - Puntos: 6</p>
+          </div>
+          <div class="combination-item">
+            <img src="ruta/de/la/imagen-escalera4.jpg" alt="Escalera 4">
+            <p><strong>Escalera de Referencia(4)(referencia)</strong> - Puntos: 8</p>
+          </div>
+          <div class="combination-item">
+            <img src="ruta/de/la/imagen-color3.jpg" alt="Escalera de Color 3">
+            <p><strong>Escalera de Color(3)(nombre y referencia)</strong> - Puntos: 10</p>
+          </div>
+          <div class="combination-item">
+            <img src="ruta/de/la/imagen-color4.jpg" alt="Escalera de Color 4">
+            <p><strong>Escalera de Color(4)(nombre y referencia)</strong> - Puntos: 15</p>
+          </div>
+          <div class="combination-item">
+            <img src="ruta/de/la/imagen-imperial.jpg" alt="Escalera Imperial">
+            <p><strong>Escalera IMPERIAL(escalera que empiece por el Nº1)</strong> - Puntos: +1/3 del valor de la escalera</p>
+          </div>
+          <div class="combination-item">
+            <img src="ruta/de/la/imagen-estrellas3.jpg" alt="Estrellas 3">
+            <p><strong>Escalera de Estrellas(3)(estrellas)</strong> - Puntos: 15</p>
+          </div>
+          <div class="combination-item">
+            <img src="ruta/de/la/imagen-estrellas4.jpg" alt="Estrellas 4">
+            <p><strong>Escalera de Estrellas(4)(estrellas)</strong> - Puntos: 20</p>
+          </div>
+        `,
+        confirmButtonText: 'Entendido!!',
+        customClass: {
+          popup: 'popup-class',
+          title: 'title-class',
+          content: 'content-class'
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.fire('¡Gracias por su tiempo!', '', 'success');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+
