@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Push Your Luck Solitary</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .container {
+            margin: 20px;
+        }
+        .card {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px;
+        }
+        .button {
+            margin: 5px;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .button:disabled {
+            background-color: grey;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Push Your Luck Solitary</h1>
+        <div id="game-info">
+            <p>Número de vidas: <span id="vidas">3</span></p>
+            <p>Contador de cartas levantadas: <span id="contadorCartas">1</span></p>
+            <p>Primera carta levantada (carta actual): <span id="cartaActual">N/A</span></p>
+        </div>
+        <div id="buttons">
+            <button class="button" id="alta" onclick="makeGuess('ALTA')">ALTA (<span id="contador-alta">15</span>)</button>
+            <button class="button" id="baja" onclick="makeGuess('BAJA')">BAJA (<span id="contador-baja">15</span>)</button>
+            <button class="button" id="mismo-color" onclick="makeGuess('MISMO_COLOR')">MISMO COLOR (<span id="contador-mismo-color">5</span>)</button>
+            <button class="button" id="distinto-color" onclick="makeGuess('DISTINTO_COLOR')">DISTINTO COLOR (<span id="contador-distinto-color">5</span>)</button>
+            <button class="button" id="suma11" onclick="makeGuess('SUMA_AL_MENOS_11-')">SUMA 11 (<span id="contador-suma">10</span>)</button>
+            <button class="button" id="comodin" onclick="makeGuess('COMODIN')">COMODÍN (<span id="contador-comodin">3</span>)</button>
+            <button class="button" id="plantarse" onclick="endGame()">PLANTARSE</button>
+        </div>
+    </div>
+
+    <script>
+        const suits = ['corazones', 'diamantes', 'tréboles', 'picas'];
+        const ranks = ['As', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+        const cardValues = { 'As': 1, 'J': 10, 'Q': 10, 'K': 10 };
+
+        let vidas = 3;
+        let contadorCartas = 1;
+        let cartaActual = null;
+        let record = 0;
+        const counters = {
+            ALTA: 15,
+            BAJA: 15,
+            MISMO_COLOR: 5,
+            DISTINTO_COLOR: 5,
+            SUMA: 10,
+            COMODIN: 3
+        };
+
+       function getRandomCard(){
+        const value = cardValues[Math.floor(Math.random() * cardValues.length)];
+        const suit = suits[Math.floor(Math.random() * suits.length)];
+        return {value, suit, color: colors[siut] };
+       }
+       function cardValue(card){
+        if (card.value === 'As') return 1;
+        if (['J', 'Q', 'K'].includes(card.value)) return 10;
+        return parseInt(card.value);
+       }
+       function getCardImage(card) {
+        return `imagenes/${card.value}_${card.suit}.png`;
+       }
+        
+
+        function updateGameInfo() {
+            document.getElementById('vidas').innerText = vidas;
+            document.getElementById('contadorCartas').innerText = contadorCartas;
+            document.getElementById('cartaActual').innerText = `${cartaActual.rank} de ${cartaActual.suit}`;
+            document.getElementById('contador-alta').innerText = counters.ALTA;
+            document.getElementById('contador-baja').innerText = counters.BAJA;
+            document.getElementById('contador-mismo-color').innerText = counters.MISMO_COLOR;
+            document.getElementById('contador-distinto-color').innerText = counters.DISTINTO_COLOR;
+            document.getElementById('contador-suma').innerText = counters.SUMA;
+            document.getElementById('contador-comodin').innerText = counters.COMODIN;
+        }
+
+        function makeGuess(tipo) {
+            if (counters[tipo] <= 0) {
+                alert('No más usos!');
+                return;
+            }
+
+            const prevCarta = cartaActual;
+            drawCard();
+            counters[tipo]--;
+
+            const result = checkGuess(tipo, prevCarta, cartaActual);
+            if (result) {
+                record++;
+                contadorCartas++;
+                if (record >= 5) {
+                    Object.keys(counters).forEach(key => {
+                        if (key !== 'WILDCARD') counters[key]++;
+                    });
+                    record = 0;
+                }
+            } else {
+                record = 0;
+                vidas--;
+                if (vidas <= 0) {
+                    alert('Game over! Te quedaste sin vidas.');
+                    endGame();
+                }
+            }
+            updateGameInfo();
+        }
+
+        function checkGuess(tipo, prevCarta, nuevaCarta) {
+            const prevValor = ValorCartas[prevCarta.rank] || parseInt(prevCarta.rank);
+            const newValue = cardValues[nuevaCarta.rank] || parseInt(nuevaCarta.rank);
+
+            switch (type) {
+                case 'ALTA':
+                    return newValue > prevValor;
+                case 'BAJA':
+                    return newValue < prevValor;
+                case 'MISMO_COLOR':
+                    return (prevCard.suit === 'corazones' || prevCarta.suit === 'diamantes') === (nuevaCarta.suit === 'corazones' || nuevaCarta.suit === 'diamantes');
+                case 'DISTINTO_COLOR':
+                    return (prevCard.suit === 'corazones' || prevCarta.suit === 'diamantes') !== (nuevaCarta.suit === 'corazones' || nuevaCarta.suit === 'diamantes');
+                case 'SUMA':
+                    return prevValor + newValue < 11;
+                case 'COMODIN':
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        function endGame() {
+            alert(`Has perdido el juego! Tu puntuaje es : ${contadorCartas}`);
+            location.reload();
+        }
+    </script>
+</body>
+</html>
