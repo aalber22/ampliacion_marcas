@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>El escondite inglés - Vertical con corazón</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; padding: 20px; }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 60px);
+      grid-template-rows: repeat(11, 40px);
+      gap: 2px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .cell {
+      border: 1px solid #ccc;
+      position: relative;
+      width: 60px;
+      height: 40px;
+    }
+    .player-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      width: 100%;
+    }
+    .player-img {
+      width: 30px;
+      height: 30px;
+    }
+    .heart-icon {
+      font-size: 16px;
+      margin-left: 3px;
+      color: red;
+    }
+    .actions, .log { margin: 20px 0; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <h1>El escondite inglés - Vertical con Corazón</h1>
+
+  <div class="actions">
+    <div id="player-actions"></div>
+    <button onclick="nextTurn()">Siguiente turno</button>
+    <div id="dice-log" class="log"></div>
+  </div>
+
+  <div class="board" id="board"></div>
+
+  <script>
+    const NUM_CELLS = 11;
+    const players = [
+      { name: 'Jugador 1', pos: 0, action: 'pararse', heart: false, img: 'p1.png' },
+      { name: 'Jugador 2', pos: 0, action: 'pararse', heart: false, img: 'p2.png' },
+      { name: 'Jugador 3', pos: 0, action: 'pararse', heart: false, img: 'p3.png' },
+    ];
+
+    const diceDefs = {
+      negro1: [1,1,1,1,2,2],
+      negro2: [1,1,1,1,0,0],
+      negro3: [1,1,0,0,0,0],
+      rojo:   [1,1,1,1,1,0]
+    };
+
+    function roll(dieName) {
+      const die = diceDefs[dieName];
+      return die[Math.floor(Math.random() * die.length)];
+    }
+
+    function getRandomBlackDice() {
+      return ['negro1', 'negro2', 'negro3'].map(roll).reduce((a, b) => a + b, 0);
+    }
+
+    function nextTurn() {
+      let log = [];
+
+      players.forEach(p => {
+        const totalBlack = getRandomBlackDice();
+        const red = roll('rojo');
+
+        log.push(`${p.name} - Dados negros: ${totalBlack}, rojo: ${red}`);
+
+        if (p.action === 'pararse') {
+          if (!p.heart && red === 1) p.heart = true;
+        } else {
+          if (p.heart) {
+            p.heart = false;
+          } else {
+            if (red === 1) {
+              p.pos -= red;
+              if (p.pos < 0) p.pos = 0;
+            } else {
+              p.pos += totalBlack;
+              if (p.pos >= NUM_CELLS) p.pos = NUM_CELLS - 1;
+            }
+          }
+        }
+      });
+
+      document.getElementById('dice-log').innerText = log.join('\n');
+      renderBoard();
+      checkWinner();
+    }
+
+    function renderBoard() {
+      const board = document.getElementById('board');
+      board.innerHTML = '';
+
+      for (let row = NUM_CELLS - 1; row >= 0; row--) {
+        for (let col = 0; col < players.length; col++) {
+          const cell = document.createElement('div');
+          cell.className = 'cell';
+
+          const p = players[col];
+          if (p.pos === row) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'player-wrapper';
+
+            const img = document.createElement('img');
+            img.src = p.img;
+            img.className = 'player-img';
+
+            wrapper.appendChild(img);
+
+            if (p.heart) {
+              const heart = document.createElement('span');
+              heart.className = 'heart-icon';
+              heart.textContent = '❤';
+              wrapper.appendChild(heart);
+            }
+
+            cell.appendChild(wrapper);
+          }
+
+          board.appendChild(cell);
+        }
+      }
+
+      
+      const playerActions = document.getElementById('player-actions');
+      playerActions.innerHTML = '';
+      players.forEach(p => {
+        const label = document.createElement('label');
+        label.innerHTML = `${p.name}: `;
+        const select = document.createElement('select');
+        ['andar', 'pararse'].forEach(action => {
+          const opt = document.createElement('option');
+          opt.value = action;
+          opt.text = action;
+          if (p.action === action) opt.selected = true;
+          select.appendChild(opt);
+        });
+        select.onchange = () => p.action = select.value;
+        label.appendChild(select);
+        playerActions.appendChild(label);
+      });
+    }
+
+    function checkWinner() {
+      const winners = players.filter(p => p.pos >= NUM_CELLS - 1);
+      if (winners.length > 0) {
+        alert('Ganador(es): ' + winners.map(p => p.name).join(', '));
+      }
+    }
+
+    renderBoard();
+  </script>
+</body>
+</html>
+
